@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { WindowsControl } from '../WindowsControl';
+import React, { useState } from 'react';
+import WindowsControl from '../WindowsControl';
 
 interface Props {
   dark?: boolean;
@@ -8,15 +8,11 @@ interface Props {
   onMinimize?: (e: React.MouseEvent<HTMLDivElement>) => void;
   onMouseUp?: (e: React.MouseEvent<HTMLDivElement>) => void;
   onMouseDown?: (e: React.MouseEvent<HTMLDivElement>) => void;
-  style?: any;
+  style?: React.CSSProperties;
   isMaximized?: boolean;
-  closeIcon?: string;
-  maximizeIcon?: string;
-  minimizeIcon?: string;
-  restoreIcon?: string;
 }
 
-export const WindowsControls = ({
+const WindowsControls = ({
   dark,
   onClose,
   onMaximize,
@@ -25,8 +21,14 @@ export const WindowsControls = ({
   style,
   isMaximized,
 }: Props) => {
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+    onMouseUp?.(event);
+  };
+
   return (
-    <div onMouseUp={onMouseUp} style={{ display: 'flex', ...style }}>
+    <div onMouseUp={handleMouseUp} style={{ display: 'flex', ...style }}>
       <WindowsControl minimize whiteIcon={dark} onClick={onMinimize} />
       <WindowsControl
         maximize={!isMaximized}
@@ -38,3 +40,5 @@ export const WindowsControls = ({
     </div>
   );
 };
+
+export default WindowsControls;

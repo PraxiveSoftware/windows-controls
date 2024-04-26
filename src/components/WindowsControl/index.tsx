@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 
 import closeIcon from '../../icons/close.svg';
-import minimizeIcon from '../../icons/minimize.svg';
 import maximizeIcon from '../../icons/maximize.svg';
+import minimizeIcon from '../../icons/minimize.svg';
 import restoreIcon from '../../icons/restore.svg';
 
 interface Props {
@@ -14,86 +14,72 @@ interface Props {
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   onMouseUp?: (e: React.MouseEvent<HTMLDivElement>) => void;
   onMouseDown?: (e: React.MouseEvent<HTMLDivElement>) => void;
-  style?: any;
+  style?: React.CSSProperties; // Use CSSProperties for styling
   disabled?: boolean;
 }
 
-interface State {
-  hover?: boolean;
-}
+const WindowsControl = ({
+  maximize,
+  close,
+  minimize,
+  restore,
+  whiteIcon,
+  onClick,
+  style,
+  disabled,
+}: Props) => {
+  const [hover, setHover] = useState(false);
 
-export class WindowsControl extends React.PureComponent<Props, State> {
-  state = {
-    hover: false,
-  };
+  const onMouseEnter = () => setHover(true);
+  const onMouseLeave = () => setHover(false);
 
-  onMouseEnter = () => {
-    this.setState({ hover: true });
-  };
+  let icon: string;
 
-  onMouseLeave = () => {
-    this.setState({ hover: false });
-  };
+  if (close) icon = closeIcon;
+  else if (minimize) icon = minimizeIcon;
 
-  public render() {
-    const { hover } = this.state;
-    const {
-      close,
-      maximize,
-      minimize,
-      restore,
-      whiteIcon,
-      onClick,
-      style,
-      disabled,
-    } = this.props;
+  if (maximize) icon = maximizeIcon; // Use strict comparison (===)
+  if (restore) icon = restoreIcon;
 
-    let icon: string;
+  const backgroundColor = hover
+    ? !close
+      ? 'rgba(196, 196, 196, 0.4)'
+      : '#e81123'
+    : 'transparent';
 
-    if (close) icon = closeIcon;
-    else if (minimize) icon = minimizeIcon;
+  const filter = whiteIcon || (close && hover) ? 'invert(100%)' : 'none';
 
-    if (maximize == true) {
-      icon = maximizeIcon;
-    }
-    if (restore == true) {
-      icon = restoreIcon;
-    }
-
-    return (
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={{
+        height: '100%',
+        width: 45,
+        minWidth: 45,
+        position: 'relative',
+        transition: '0.2s background-color',
+        backgroundColor,
+        pointerEvents: disabled ? 'none' : 'auto',
+        ...style,
+      }}
+    >
       <div
-        onClick={onClick}
-        onMouseEnter={this.onMouseEnter}
-        onMouseLeave={this.onMouseLeave}
         style={{
+          width: '100%',
           height: '100%',
-          width: 45,
-          minWidth: 45,
-          position: 'relative',
-          transition: '0.2s background-color',
-          backgroundColor: hover
-            ? !close
-              ? 'rgba(196, 196, 196, 0.4)'
-              : '#e81123'
-            : 'transparent',
-          pointerEvents: disabled ? 'none' : 'auto',
-          ...style,
+          transition: '0.2s filter',
+          filter,
+          backgroundPosition: 'center',
+          backgroundSize: '11px',
+          backgroundRepeat: 'no-repeat',
+          backgroundImage: `url(${icon})`,
+          opacity: disabled ? 0.54 : 1,
         }}
-      >
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            transition: '0.2s filter',
-            filter: whiteIcon || (close && hover) ? 'invert(100%)' : 'none',
-            backgroundPosition: 'center',
-            backgroundSize: '11px',
-            backgroundRepeat: 'no-repeat',
-            backgroundImage: `url(${icon})`,
-            opacity: disabled ? 0.54 : 1,
-          }}
-        />
-      </div>
-    );
-  }
-}
+      />
+    </div>
+  );
+};
+
+export default WindowsControl;
